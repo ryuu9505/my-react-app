@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const ImageContainer = styled.div`
@@ -27,7 +27,7 @@ const Overlay = styled.div`
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: ${({ isHovered }) => (isHovered ? 1 : 0)};
+  opacity: ${({ $isHovered }) => ($isHovered ? 1 : 0)};
   transition: opacity 0.4s;
   background: radial-gradient(
     circle,
@@ -61,8 +61,8 @@ const ActionButton = styled.button`
     transform 0.4s,
     box-shadow 0.2s;
   z-index: 3;
-  ${({ isHovered }) =>
-    isHovered &&
+  ${({ $isHovered }) =>
+    $isHovered &&
     `
       opacity: 1;
       transform: translate(-50%, -50%) scale(1.04);
@@ -80,8 +80,10 @@ const HoverImage = ({
   showOverlay = false,
   showButton = true,
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const handleButtonClick = (e) => {
-    e.preventDefault();
+    e.stopPropagation();
     if (onButtonClick) {
       onButtonClick();
     } else if (link) {
@@ -90,20 +92,24 @@ const HoverImage = ({
   };
 
   return (
-    <ImageContainer>
+    <ImageContainer
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <a href={link} target="_blank" rel="noopener noreferrer">
         <BaseImage src={baseImage} alt={alt} />
-        {showOverlay && <Overlay isHovered={false} />}
-        {showButton && (
-          <ActionButton
-            isHovered={false}
-            onClick={handleButtonClick}
-            tabIndex={-1}
-          >
-            {buttonText}
-          </ActionButton>
-        )}
       </a>
+      {showOverlay && <Overlay $isHovered={isHovered} />}
+      {showButton && (
+        <ActionButton
+          $isHovered={isHovered}
+          onClick={handleButtonClick}
+          tabIndex={0}
+          aria-label={buttonText}
+        >
+          {buttonText}
+        </ActionButton>
+      )}
     </ImageContainer>
   );
 };

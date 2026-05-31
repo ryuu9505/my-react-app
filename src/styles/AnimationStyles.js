@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { FaStar, FaTrophy } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
 import styled, { keyframes } from 'styled-components';
 
 const pulse = keyframes`
@@ -77,8 +77,8 @@ const StarContainer = styled(motion.div)`
 `;
 
 const Star = styled(motion.span)`
-  color: ${({ color }) => color || '#FFD700'};
-  font-size: ${({ size }) => size || '1.3rem'};
+  color: ${({ $color }) => $color || '#FFD700'};
+  font-size: ${({ $size }) => $size || '1.3rem'};
   margin: 0 4px;
   text-shadow: 0 0 8px #ffd70088;
 `;
@@ -144,7 +144,7 @@ export function StarRatingAnimation({
           style={style}
         >
           {Array.from({ length: count }).map((_, i) => (
-            <Star key={i} variants={starVariants} size={size} color={color}>
+            <Star key={i} variants={starVariants} $size={size} $color={color}>
               <FaStar />
             </Star>
           ))}

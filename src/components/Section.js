@@ -26,12 +26,18 @@ export const Section = ({
     color = theme.colors.text || '#222';
   }
 
+  const { padding, ...restProps } = props;
+
   return (
     <StyledSection
-      background={background}
-      color={color}
-      {...props}
-      style={{ ...(props.style || {}), display: visible ? undefined : 'none' }}
+      $background={background}
+      $color={color}
+      $padding={padding}
+      {...restProps}
+      style={{
+        ...(restProps.style || {}),
+        display: visible ? undefined : 'none',
+      }}
     >
       {children}
     </StyledSection>
@@ -55,7 +61,7 @@ export const SectionTitle = ({
   }
 
   return (
-    <StyledSectionTitle color={color} {...props}>
+    <StyledSectionTitle $color={color} {...props}>
       {children}
     </StyledSectionTitle>
   );

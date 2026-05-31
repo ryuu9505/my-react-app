@@ -1,11 +1,11 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 const StyledTitle = styled.h2`
-  font-size: ${({ fontSize }) => fontSize || '2rem'};
-  font-weight: ${({ fontWeight }) => fontWeight || 700};
-  margin: ${({ margin }) => margin || '0 0 16px 0'};
-  color: ${({ color }) => color || '#222'};
+  font-size: ${({ $fontSize }) => $fontSize || '2rem'};
+  font-weight: ${({ $fontWeight }) => $fontWeight || 700};
+  margin: ${({ $margin }) => $margin || '0 0 16px 0'};
+  color: ${({ $color }) => $color || '#222'};
 `;
 
 export function Title({
@@ -20,10 +20,10 @@ export function Title({
   return (
     <StyledTitle
       as={as}
-      fontSize={fontSize}
-      fontWeight={fontWeight}
-      margin={margin}
-      color={color}
+      $fontSize={fontSize}
+      $fontWeight={fontWeight}
+      $margin={margin}
+      $color={color}
       {...props}
     >
       {children}

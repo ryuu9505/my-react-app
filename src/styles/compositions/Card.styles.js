@@ -1,23 +1,23 @@
 import styled from 'styled-components';
 
 export const Card = styled.div`
-  background-color: ${({ theme, dark }) =>
-    dark ? theme.colors.backgroundDark : theme.colors.backgroundLight};
-  border-radius: ${({ radius }) => radius || '0'};
+  background-color: ${({ theme, $dark }) =>
+    $dark ? theme.colors.backgroundDark : theme.colors.backgroundLight};
+  border-radius: ${({ $radius }) => $radius || '0'};
   overflow: hidden;
-  box-shadow: ${({ elevation }) =>
-    elevation
-      ? `0 ${elevation * 2}px ${elevation * 4}px rgba(0, 0, 0, 0.1)`
+  box-shadow: ${({ $elevation }) =>
+    $elevation
+      ? `0 ${$elevation * 2}px ${$elevation * 4}px rgba(0, 0, 0, 0.1)`
       : 'none'};
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
 
   &:hover {
-    transform: ${({ hover }) => (hover ? 'translateY(-5px)' : 'none')};
-    box-shadow: ${({ hover, elevation }) =>
-      hover && elevation
-        ? `0 ${elevation * 3}px ${elevation * 6}px rgba(0, 0, 0, 0.15)`
+    transform: ${({ $hover }) => ($hover ? 'translateY(-5px)' : 'none')};
+    box-shadow: ${({ $hover, $elevation }) =>
+      $hover && $elevation
+        ? `0 ${$elevation * 3}px ${$elevation * 6}px rgba(0, 0, 0, 0.15)`
         : 'none'};
   }
 `;

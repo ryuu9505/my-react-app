@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const RoundedImage = styled.img`
-  width: ${({ size }) => (size ? `${size}px` : '200px')};
-  height: ${({ size }) => (size ? `${size}px` : '200px')};
+  width: ${({ $size }) => ($size ? `${$size}px` : '200px')};
+  height: ${({ $size }) => ($size ? `${$size}px` : '200px')};
   border-radius: 50%;
   border: 1.5px solid #e0e0e0;
   box-sizing: border-box;

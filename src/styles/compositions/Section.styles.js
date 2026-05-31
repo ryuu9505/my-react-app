@@ -2,17 +2,17 @@ import styled from 'styled-components';
 
 export const Section = styled.section`
   width: 100%;
-  padding: ${({ padding }) => padding || '200px 20px 200px 20px'};
-  background-color: ${({ background, theme }) =>
-    background || theme.colors.backgroundLight};
-  color: ${({ color, theme }) => color || theme.colors.textLight};
+  padding: ${({ $padding }) => $padding || '200px 20px 200px 20px'};
+  background-color: ${({ $background, theme }) =>
+    $background || theme.colors.backgroundLight};
+  color: ${({ $color, theme }) => $color || theme.colors.textLight};
   text-align: center;
   overflow: hidden;
 `;
 
 export const SectionTitle = styled.h2`
   font-size: 2.5rem;
-  color: ${({ color, theme }) => color || theme.colors.textLight};
+  color: ${({ $color, theme }) => $color || theme.colors.textLight};
   margin-bottom: 50px;
   text-align: center;
   opacity: 0.8;
@@ -23,7 +23,7 @@ export const SectionDescription = styled.div`
   font-size: 1.6rem;
   line-height: 1.2;
   font-weight: 200;
-  color: ${({ color, theme }) => color || theme.colors.secondary};
+  color: ${({ $color, theme }) => $color || theme.colors.secondary};
   margin-bottom: 0px;
   text-align: center;
 

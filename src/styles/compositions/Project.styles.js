@@ -25,12 +25,12 @@ export const ProjectList = styled.div`
 export const ProjectCard = styled.div`
   background-color: ${({ theme }) => theme.colors.backgroundLight};
   border-radius: 0;
-  width: ${({ width }) => width || '350px'};
+  width: ${({ $width }) => $width || '350px'};
   will-change: transform;
   backface-visibility: hidden;
 
   @media (max-width: 480px) {
-    width: ${({ width }) => (width ? `calc(${width} * 0.8)` : '300px')};
+    width: ${({ $width }) => ($width ? `calc(${$width} * 0.8)` : '300px')};
   }
 `;
 
@@ -66,38 +66,38 @@ export const ProjectContent = styled.div`
 `;
 
 export const ProjectTitle = styled.h3`
-  font-size: ${({ fontSize }) => fontSize || '1.6rem'};
-  font-weight: ${({ fontWeight }) => fontWeight || '700'};
+  font-size: ${({ $fontSize }) => $fontSize || '1.6rem'};
+  font-weight: ${({ $fontWeight }) => $fontWeight || '700'};
   color: ${({ theme }) => theme.colors.primary};
   margin-top: 12px;
 
   @media (max-width: 480px) {
-    font-size: ${({ fontSize }) =>
-      fontSize ? `calc(${fontSize} * 0.8)` : '1.3rem'};
-    font-weight: ${({ fontWeight }) =>
-      fontWeight ? `calc(${fontWeight} * 0.8)` : '560'};
+    font-size: ${({ $fontSize }) =>
+      $fontSize ? `calc(${$fontSize} * 0.8)` : '1.3rem'};
+    font-weight: ${({ $fontWeight }) =>
+      $fontWeight ? `calc(${$fontWeight} * 0.8)` : '560'};
     margin-top: 15px;
   }
 `;
 
 export const ProjectDescription = styled.p`
-  font-size: ${({ fontSize }) => fontSize || '1.0rem'};
-  font-weight: ${({ fontWeight }) => fontWeight || '200'};
+  font-size: ${({ $fontSize }) => $fontSize || '1.0rem'};
+  font-weight: ${({ $fontWeight }) => $fontWeight || '200'};
   color: ${({ theme }) => theme.colors.secondary};
   margin-top: 4px;
 
   @media (max-width: 480px) {
-    font-size: ${({ fontSize }) =>
-      fontSize ? `calc(${fontSize} * 0.8)` : '0.95rem'};
-    font-weight: ${({ fontWeight }) =>
-      fontWeight ? `calc(${fontWeight} * 0.8)` : '160'};
+    font-size: ${({ $fontSize }) =>
+      $fontSize ? `calc(${$fontSize} * 0.8)` : '0.95rem'};
+    font-weight: ${({ $fontWeight }) =>
+      $fontWeight ? `calc(${$fontWeight} * 0.8)` : '160'};
     margin: 2px 0;
   }
 `;
 
 export const Period = styled.span`
-  font-size: ${({ fontSize }) => fontSize || '1.0rem'};
-  font-weight: ${({ fontWeight }) => fontWeight || '200'};
+  font-size: ${({ $fontSize }) => $fontSize || '1.0rem'};
+  font-weight: ${({ $fontWeight }) => $fontWeight || '200'};
   color: ${({ theme }) => theme.colors.secondary}99;
   display: block;
   margin-top: 6px;
