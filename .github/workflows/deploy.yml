@@ -36,10 +36,6 @@ jobs:
         run: npm run build
         continue-on-error: false
 
-      - name: Debug SSH Key
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}"
-
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -59,7 +55,7 @@ jobs:
             echo "✅ Old files removed."
             sudo mkdir -p /var/www/react-app
             sudo chown -R $USER:$USER /var/www/react-app
-            sudo chmod -R 777 /var/www/react-app
+            sudo chmod -R 755 /var/www/react-app
 
       - name: Upload Build Files to Instance
         uses: appleboy/scp-action@v0.1.7

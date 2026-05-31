@@ -1,4 +1,5 @@
 {
+  "extends": ["react-app"],
   "parser": "@babel/eslint-parser",
   "parserOptions": {
     "requireConfigFile": false,
@@ -22,6 +23,8 @@
     "simple-import-sort/exports": "error",
     "import/first": "error",
     "import/newline-after-import": "error",
-    "import/no-duplicates": "error"
+    "import/no-duplicates": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   }
 }
