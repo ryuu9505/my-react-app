@@ -1,11 +1,13 @@
-import api from '@apis/Api';
-import { ProfileCard } from '@components/Card';
+import { fetchUsersCursor } from '@apis/userApi';
+import { ProfileCard } from '@components/cards';
 import Footer from '@components/Footer';
 import BasicHeader from '@components/header/BasicHeader';
 import Loading from '@components/Loading';
 import { Section } from '@components/Section';
 import Spinner from '@components/Spinner';
-import React, { useEffect, useRef, useState } from 'react';
+import useInfiniteScroll from '@hooks/useInfiniteScroll';
+import { transformCompanyLogos } from '@utils/transformCompanyLogos';
+import React, { useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 
@@ -23,56 +25,12 @@ const CenteredCardList = styled.div`
 `;
 
 export default function UserListPage() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [lastId, setLastId] = useState(null);
-  const loadingRef = useRef(false);
+  const fetchPage = useCallback(
+    (cursor) => fetchUsersCursor({ pageSize: 10, lastId: cursor }),
+    []
+  );
 
-  const fetchUsers = async (cursor) => {
-    if (loadingRef.current || !hasMore) return;
-    loadingRef.current = true;
-    setLoading(true);
-    try {
-      const params = { pageSize: 10 };
-      if (cursor) params.lastId = cursor;
-      const res = await api.get('/users/cursor', { params });
-      const newUsers = res.data.content || res.data;
-      setUsers((prev) => [...prev, ...newUsers]);
-      setHasMore(!res.data.last);
-      if (newUsers.length > 0) setLastId(newUsers[newUsers.length - 1].id);
-    } finally {
-      setLoading(false);
-      loadingRef.current = false;
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers(null);
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 100
-      ) {
-        if (!loadingRef.current && hasMore) fetchUsers(lastId);
-      }
-    };
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [hasMore, lastId]);
-
-  useEffect(() => {
-    if (
-      !loading &&
-      hasMore &&
-      document.body.offsetHeight <= window.innerHeight
-    ) {
-      fetchUsers(lastId);
-    }
-  }, [loading, hasMore, lastId]);
+  const { items: users, loading, hasMore } = useInfiniteScroll(fetchPage);
 
   if (users.length === 0 && loading) return <Loading />;
 
@@ -88,40 +46,17 @@ export default function UserListPage() {
       </Helmet>
       <Section id="users" padding="100px 20px 100px 20px">
         <CenteredCardList>
-          {users.map((user) => {
-            const companyLogos = Array.isArray(user.careers)
-              ? user.careers
-                  .slice(0, 3)
-                  .map((career) => {
-                    const company = career.company;
-                    if (company?.wideLogo?.url)
-                      return {
-                        url: company.wideLogo.url,
-                        altText: company.wideLogo.altText,
-                        isWide: true,
-                      };
-                    if (company?.logo?.url)
-                      return {
-                        url: company.logo.url,
-                        altText: company.logo.altText,
-                        isWide: false,
-                      };
-                    return null;
-                  })
-                  .filter(Boolean)
-              : [];
-            return (
-              <ProfileCard
-                key={user.id || user._id || user.name}
-                profileImage={user.profileImage}
-                name={user.name}
-                username={user.username || user.id || user._id}
-                bio={user.bio || ''}
-                companyLogos={companyLogos}
-                userType={user.userType}
-              />
-            );
-          })}
+          {users.map((user) => (
+            <ProfileCard
+              key={user.id || user._id || user.name}
+              profileImage={user.profileImage}
+              name={user.name}
+              username={user.username || user.id || user._id}
+              bio={user.bio || ''}
+              companyLogos={transformCompanyLogos(user.careers)}
+              userType={user.userType}
+            />
+          ))}
         </CenteredCardList>
         {loading && users.length > 0 && (
           <Spinner style={{ marginTop: 80, height: 10 }} />

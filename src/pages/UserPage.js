@@ -1,7 +1,6 @@
-import api from '@apis/Api';
 import { socialData } from '@assets/data';
-import { profilePic, robot, verified } from '@assets/images';
-import { HistoryCardItem, TechCard } from '@components/Card';
+import { profilePic, robot } from '@assets/images';
+import { HistoryCardItem, TechCard } from '@components/cards';
 import Divider from '@components/Divider';
 import FilmSection from '@components/FilmSection';
 import Footer from '@components/Footer';
@@ -10,6 +9,7 @@ import HeaderNotice from '@components/HeaderNotice';
 import HoverImage from '@components/HoverImage';
 import Loading from '@components/Loading';
 import { Section, SectionTitle } from '@components/Section';
+import useUser from '@hooks/useUser';
 import { PulseAnimation, ScrollAnimation } from '@styles/AnimationStyles';
 import { CardList } from '@styles/compositions/Card.styles';
 import {
@@ -28,74 +28,13 @@ import { RoundedImage } from '@styles/ImageStyles';
 import { formatDate } from '@utils/format';
 import isEmpty from '@utils/isEmpty';
 import { sectionConfig } from '@utils/sections';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 
 export default function UserPage() {
   const { username } = useParams();
-  const [userInfo, setUserInfo] = useState({
-    id: '',
-    name: '',
-    bio: '',
-    profileImage: { url: '', altText: '' },
-    skills: [],
-    projects: [],
-    posts: [],
-    userType: '',
-  });
-  const [careers, setCareers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!username) return;
-    (async () => {
-      try {
-        const res = await api.get(`/users/by-username/${username}`);
-        setUserInfo({
-          id: res.data.id,
-          name: res.data.name,
-          bio: res.data.bio,
-          profileImage: res.data.profileImage
-            ? res.data.profileImage
-            : { url: '', altText: '' },
-          skills: Array.isArray(res.data.skills) ? res.data.skills : [],
-          projects: Array.isArray(res.data.projectSummaries)
-            ? res.data.projectSummaries
-            : [],
-          posts: Array.isArray(res.data.postSummaries)
-            ? res.data.postSummaries
-            : [],
-          userType: res.data.userType,
-        });
-      } catch (err) {
-        setUserInfo({
-          id: '',
-          name: '이름을 불러올 수 없음',
-          bio: '정보를 불러올 수 없음',
-          profileImage: { url: '', altText: '' },
-          skills: [],
-          projects: [],
-          posts: [],
-          userType: '',
-        });
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [username]);
-
-  useEffect(() => {
-    if (!userInfo.id) return;
-    (async () => {
-      try {
-        const res = await api.get(`/careers?userId=${userInfo.id}`);
-        setCareers(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        setCareers([]);
-      }
-    })();
-  }, [userInfo.id]);
+  const { userInfo, careers, loading } = useUser(username);
 
   const sectionVisibility = {};
   sectionConfig.forEach((section) => {
@@ -110,53 +49,48 @@ export default function UserPage() {
 
   if (loading) return <Loading />;
 
-  const cleanedBio = userInfo.bio
-    ? userInfo.bio.replace(/"/g, '\\"').replace(/\\n/g, ' ')
-    : '';
+  const profileJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    mainEntity: {
+      '@type': 'Person',
+      name: userInfo.name,
+      alternateName: username,
+      url: `https://unblind.kr/${username}`,
+      description: userInfo.bio || '',
+      image: {
+        '@type': 'ImageObject',
+        url: userInfo.profileImage?.url || '',
+      },
+    },
+  });
+
+  const breadcrumbJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Users',
+        item: 'https://unblind.kr/users',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: userInfo.name,
+        item: `https://unblind.kr/${username}`,
+      },
+    ],
+  });
 
   return (
     <>
       <Helmet>
         <title>{`${userInfo.name} (@${username}) | Unblind`}</title>
-        <meta name="description" content={`${userInfo.bio}`} />
-        <script type="application/ld+json">
-          {`
-          {
-            "@context": "https://schema.org",
-            "@type": "ProfilePage",
-            "mainEntity": {
-              "@type": "Person",
-              "name": "${userInfo.name}",
-              "alternateName": "${username}",
-              "url": "https://unblind.kr/${username}",
-              "description": "${cleanedBio}",
-              "image": {
-                "@type": "ImageObject",
-                "url": "${userInfo.profileImage?.url}"
-              }
-            }
-          }
-        `}
-        </script>
-        <script type="application/ld+json">
-          {`
-          {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [{
-              "@type": "ListItem",
-              "position": 1,
-              "name": "Users",
-              "item": "https://unblind.kr/users"
-            },{
-              "@type": "ListItem",
-              "position": 2,
-              "name": "${userInfo.name}",
-              "item": "https://unblind.kr/${username}"
-            }]
-          }
-        `}
-        </script>
+        <meta name="description" content={userInfo.bio || ''} />
+        <script type="application/ld+json">{profileJsonLd}</script>
+        <script type="application/ld+json">{breadcrumbJsonLd}</script>
       </Helmet>
 
       <Header sectionVisibility={sectionVisibility} />
@@ -219,7 +153,7 @@ export default function UserPage() {
         </SectionTitle>
 
         <SkillCardList>
-          {userInfo.skills.map((skill, idx) => (
+          {userInfo.skills.map((skill) => (
             <ScrollAnimation key={skill.id} delay={0.3}>
               <TechCard
                 url={skill.tool.logo.url}
@@ -268,7 +202,7 @@ export default function UserPage() {
 
         <ProjectList>
           {userInfo.posts.map((post, index) => (
-            <ProjectCard key={index} width="256px">
+            <ProjectCard key={index} $width="256px">
               <ScrollAnimation delay={0.3}>
                 <ProjectImageContainer>
                   <HoverImage
@@ -279,11 +213,11 @@ export default function UserPage() {
                   />
                 </ProjectImageContainer>
                 <ProjectContent>
-                  <ProjectTitle fontSize="1.0rem">{post.title}</ProjectTitle>
-                  <ProjectDescription fontSize="0.8rem">
+                  <ProjectTitle $fontSize="1.0rem">{post.title}</ProjectTitle>
+                  <ProjectDescription $fontSize="0.8rem">
                     {post.subtitle}
                   </ProjectDescription>
-                  <Period fontSize="0.8rem" fontWeight="100">
+                  <Period $fontSize="0.8rem" $fontWeight="100">
                     {formatDate(post.createdAt)}
                   </Period>
                 </ProjectContent>

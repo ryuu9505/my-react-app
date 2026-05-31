@@ -1,9 +1,108 @@
-import './LoginPage.css';
-
+import { useAuth } from '@components/AuthProvider';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
-import { useAuth } from '../components/AuthProvider';
+const GoogleButton = styled.button`
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-appearance: none;
+  background-color: white;
+  background-image: none;
+  border: 1px solid #747775;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  height: 40px;
+  letter-spacing: 0.25px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  transition:
+    background-color 0.218s,
+    border-color 0.218s,
+    box-shadow 0.218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 400px;
+  min-width: min-content;
+  margin-bottom: 16px;
+
+  &:disabled {
+    cursor: default;
+    background-color: #ffffff61;
+    border-color: #1f1f1f1f;
+  }
+
+  &:not(:disabled):active,
+  &:not(:disabled):focus {
+    .button-state {
+      background-color: #303030;
+      opacity: 0.12;
+    }
+  }
+
+  &:not(:disabled):hover {
+    box-shadow:
+      0 1px 2px 0 rgba(60, 64, 67, 0.3),
+      0 1px 3px 1px rgba(60, 64, 67, 0.15);
+
+    .button-state {
+      background-color: #303030;
+      opacity: 0.08;
+    }
+  }
+`;
+
+const ButtonState = styled.div`
+  transition: opacity 0.218s;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
+
+const ButtonContentWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+`;
+
+const ButtonContents = styled.span`
+  flex-grow: 1;
+  font-family: 'Roboto', arial, sans-serif;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+`;
+
+const ButtonIcon = styled.div`
+  height: 20px;
+  margin-right: 12px;
+  min-width: 20px;
+  width: 20px;
+  display: block;
+
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+`;
 
 function LoginPage() {
   const { login } = useAuth();
@@ -33,10 +132,10 @@ function LoginPage() {
     <div style={{ maxWidth: 400, margin: '0 auto', padding: 32 }}>
       <h2>Login</h2>
 
-      <button className="gsi-material-button" onClick={handleGoogleLogin}>
-        <div className="gsi-material-button-state"></div>
-        <div className="gsi-material-button-content-wrapper">
-          <div className="gsi-material-button-icon">
+      <GoogleButton onClick={handleGoogleLogin}>
+        <ButtonState className="button-state" />
+        <ButtonContentWrapper>
+          <ButtonIcon>
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
@@ -62,13 +161,10 @@ function LoginPage() {
               ></path>
               <path fill="none" d="M0 0h48v48H0z"></path>
             </svg>
-          </div>
-          <span className="gsi-material-button-contents">
-            Continue with Google
-          </span>
-          <span style={{ display: 'none' }}>Continue with Google</span>
-        </div>
-      </button>
+          </ButtonIcon>
+          <ButtonContents>Continue with Google</ButtonContents>
+        </ButtonContentWrapper>
+      </GoogleButton>
 
       <div style={{ textAlign: 'center', margin: '16px 0', color: '#999' }}>
         OR

@@ -1,52 +1,52 @@
-import api from '@apis/Api';
 import Container from '@components/Container';
 import Divider from '@components/Divider';
+import Loading from '@components/Loading';
 import { PostTitle } from '@components/Title';
+import usePost from '@hooks/usePost';
 import {
   PostImageContainer,
   ProjectContent,
   ProjectDescription,
 } from '@styles/compositions/Project.styles';
 import { RoundedImage } from '@styles/ImageStyles';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 
 export default function PostPage() {
   const { postId } = useParams();
-  const [post, setPost] = useState({
-    title: '',
-    author: { name: '' },
-    createdAt: '',
-    content: '',
-    thumbnail: { url: '', altText: '' },
-  });
+  const { post, loading, error } = usePost(postId);
 
-  useEffect(() => {
-    if (!postId) return;
-    (async () => {
-      try {
-        const res = await api.get(`/posts/${postId}`);
-        setPost(res.data);
-      } catch (err) {
-        setPost({
-          title: '제목을 불러올 수 없음',
-          author: { name: '알 수 없음' },
-          createdAt: '',
-          content: '내용을 불러올 수 없음',
-          thumbnail: { url: '', altText: '' },
-        });
-      }
-    })();
-  }, [postId]);
+  if (loading) return <Loading />;
+
+  if (error || !post) {
+    return (
+      <Container maxWidth="1024px">
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '200px 20px',
+            color: '#888',
+          }}
+        >
+          <h2 style={{ fontWeight: 400, marginBottom: 12 }}>
+            포스트를 불러올 수 없습니다
+          </h2>
+          <p style={{ fontWeight: 200 }}>
+            존재하지 않거나 삭제된 포스트입니다.
+          </p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <>
       <Helmet>
-        <title>{`${post.title}`} | Unblind</title>
+        <title>{post.title} | Unblind</title>
         <meta
           name="description"
-          content={`${post.content.substring(0, 50)}...`}
+          content={`${(post.content || '').substring(0, 50)}...`}
         />
       </Helmet>
 
@@ -64,7 +64,7 @@ export default function PostPage() {
           <PostTitle>{post.title}</PostTitle>
           <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
             <span style={{ fontWeight: 500, fontSize: 20 }}>
-              {post.user?.name}
+              {post.author?.name}
             </span>
             <span style={{ color: '#aaa', fontSize: 20 }}>
               {post.createdAt?.slice(0, 10)}
