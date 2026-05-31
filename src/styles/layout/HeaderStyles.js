@@ -1,3 +1,4 @@
+import { LAYOUT } from '@styles/constants';
 import styled from 'styled-components';
 
 export const HeaderContainer = styled.header`
@@ -9,7 +10,7 @@ export const HeaderContainer = styled.header`
 
   // size
   width: 100%;
-  height: 44px;
+  height: ${LAYOUT.HEADER_HEIGHT}px;
 
   // layout
   align-items: center;
@@ -32,7 +33,7 @@ export const NavMenu = styled.nav`
   gap: 36px;
 `;
 
-export const NavLink = styled.a`
+export const NavLink = styled.span`
   color: ${({ theme }) => theme.colors.primary || '#333333'};
   font-size: 0.7rem;
   font-weight: 300;

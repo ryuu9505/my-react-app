@@ -1,50 +1,20 @@
-import { useAuth } from '@components/AuthProvider';
-import ProfileDropdown from '@components/header/ProfileDropdown';
-import LoginButton from '@components/LoginButton';
+import ProfileSection from '@components/header/ProfileSection';
 import Logo from '@components/Logo';
-import { RoundedImage } from '@styles/ImageStyles';
+import useProfileDropdown from '@hooks/useProfileDropdown';
 import { HeaderContainer } from '@styles/layout/HeaderStyles';
-import React, { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 function BasicHeader() {
-  const { user, loading, logout } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-  const navigate = useNavigate();
-
-  // 드롭다운 외부 클릭 감지
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    }
-
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
-    }
-  }, [isDropdownOpen]);
-
-  const handleProfileClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const handleMyPage = () => {
-    if (user?.username) {
-      navigate(`/${user.username}`);
-      setIsDropdownOpen(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    setIsDropdownOpen(false);
-    navigate('/');
-  };
+  const {
+    user,
+    loading,
+    isDropdownOpen,
+    dropdownRef,
+    handleProfileClick,
+    handleMyPage,
+    handleLogout,
+  } = useProfileDropdown();
 
   return (
     <>
@@ -77,27 +47,15 @@ function BasicHeader() {
             justifyContent: 'flex-end',
           }}
         >
-          {loading ? (
-            // 로딩 중일 때는 빈 공간 유지 (깜빡임 방지)
-            <div style={{ width: 30, height: 30 }} />
-          ) : user ? (
-            <div style={{ position: 'relative' }} ref={dropdownRef}>
-              <RoundedImage
-                src={user.profileImage?.url || '/default-profile.png'}
-                size={30}
-                onClick={handleProfileClick}
-                style={{ cursor: 'pointer' }}
-              />
-              {isDropdownOpen && (
-                <ProfileDropdown
-                  onMyPage={handleMyPage}
-                  onLogout={handleLogout}
-                />
-              )}
-            </div>
-          ) : (
-            <LoginButton />
-          )}
+          <ProfileSection
+            user={user}
+            loading={loading}
+            isDropdownOpen={isDropdownOpen}
+            dropdownRef={dropdownRef}
+            onProfileClick={handleProfileClick}
+            onMyPage={handleMyPage}
+            onLogout={handleLogout}
+          />
         </div>
       </HeaderContainer>
     </>
