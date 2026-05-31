@@ -7,17 +7,22 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const loadCurrentUser = async () => {
+    const me = await fetchMe();
+    if (me && me.id) {
+      const userDetail = await fetchUserById(me.id);
+      setUser(userDetail);
+    } else {
+      setUser(null);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const me = await fetchMe();
-        if (me && me.id) {
-          const userDetail = await fetchUserById(me.id);
-          setUser(userDetail);
-        } else {
-          setUser(null);
-        }
-      } catch (e) {
+        await loadCurrentUser();
+      } catch (error) {
+        console.error('사용자 세션 복원 실패:', error);
         setUser(null);
       } finally {
         setLoading(false);
@@ -28,16 +33,10 @@ export function AuthProvider({ children }) {
   const handleLogin = async (username, password) => {
     try {
       await login(username, password);
-      const me = await fetchMe();
-      if (me && me.id) {
-        const userDetail = await fetchUserById(me.id);
-        setUser(userDetail);
-      } else {
-        setUser(null);
-      }
+      await loadCurrentUser();
     } catch (error) {
       setUser(null);
-      throw error; // 컴포넌트에서 에러 메시지를 표시할 수 있도록 throw
+      throw error;
     }
   };
 
@@ -46,7 +45,6 @@ export function AuthProvider({ children }) {
       await logout();
       setUser(null);
     } catch (error) {
-      // 로그아웃 실패시에도 클라이언트 상태는 초기화
       setUser(null);
       console.error('로그아웃 중 오류 발생:', error);
     }
