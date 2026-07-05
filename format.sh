@@ -4,7 +4,7 @@
 set -e
 
 echo "🔍 Running ESLint (with --fix)..."
-npx eslint . --fix
+npx eslint src --fix
 
 echo "🎨 Running Prettier..."
 npx prettier --write .

@@ -8,3 +8,15 @@ export const FooterContainer = styled.footer`
   padding: 3rem 0;
   text-align: center;
 `;
+
+export const FooterIconList = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+
+  a {
+    font-size: 1.3rem;
+  }
+`;

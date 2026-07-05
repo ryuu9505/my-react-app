@@ -1,6 +1,5 @@
 export const fonts = {
   primary: 'sans-serif',
-  bmhanna: 'BMHANNA, sans-serif',
 };
 
 export const fontSizes = {

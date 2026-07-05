@@ -17,62 +17,61 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'npm'
-
-      - name: Cache Dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install Dependencies
         run: npm ci
 
+      # 배포 워크플로는 CI와 독립적으로 트리거되므로, 깨진 커밋이
+      # 그대로 배포되지 않도록 여기서도 lint/test를 통과시킨다.
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
       - name: Build React App
         run: npm run build
-        continue-on-error: false
+        env:
+          VITE_API_BASE_URL: https://api.unblind.kr
 
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.INSTANCE_IP }} >> ~/.ssh/known_hosts
-
-      - name: SSH into Instance and Prepare Server
+      # 기존 사이트를 지우기 전에 새 빌드를 스테이징 디렉토리에 먼저 올리고,
+      # 마지막에 디렉토리 교체로 반영한다 (다운타임 최소화, 업로드 실패 시 기존 사이트 유지).
+      - name: Prepare Staging Directory
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.INSTANCE_IP }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "🔄 Removing old build files..."
-            sudo rm -rf /var/www/react-app/*
-            echo "✅ Old files removed."
-            sudo mkdir -p /var/www/react-app
-            sudo chown -R $USER:$USER /var/www/react-app
-            sudo chmod -R 755 /var/www/react-app
+            set -e
+            sudo rm -rf /var/www/react-app-staging
+            sudo mkdir -p /var/www/react-app-staging
+            sudo chown -R $USER:$USER /var/www/react-app-staging
+            sudo chmod -R 755 /var/www/react-app-staging
 
-      - name: Upload Build Files to Instance
+      - name: Upload Build Files to Staging
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.INSTANCE_IP }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: 'build/*'
-          target: '/var/www/react-app/'
+          target: '/var/www/react-app-staging/'
 
-      - name: Restart Nginx
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Activate New Release
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.INSTANCE_IP }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "🔄 Restarting Nginx..."
-            sudo systemctl restart nginx
+            set -e
+            sudo rm -rf /var/www/react-app-previous
+            if [ -d /var/www/react-app ]; then
+              sudo mv /var/www/react-app /var/www/react-app-previous
+            fi
+            sudo mv /var/www/react-app-staging /var/www/react-app
+            sudo systemctl reload nginx
             echo "✅ Deployment complete!"

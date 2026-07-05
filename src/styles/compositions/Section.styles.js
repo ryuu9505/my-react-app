@@ -8,6 +8,8 @@ export const Section = styled.section`
   color: ${({ $color, theme }) => $color || theme.colors.textLight};
   text-align: center;
   overflow: hidden;
+  // 고정 헤더에 가려지지 않도록 앵커 스크롤 위치를 보정한다.
+  scroll-margin-top: 64px;
 `;
 
 export const SectionTitle = styled.h2`
@@ -16,20 +18,6 @@ export const SectionTitle = styled.h2`
   margin-bottom: 50px;
   text-align: center;
   opacity: 0.8;
-`;
-
-export const SectionDescription = styled.div`
-  margin-top: 0px;
-  font-size: 1.6rem;
-  line-height: 1.2;
-  font-weight: 200;
-  color: ${({ $color, theme }) => $color || theme.colors.secondary};
-  margin-bottom: 0px;
-  text-align: center;
-
-  @media (max-width: 480px) {
-    font-size: 1.1rem;
-  }
 `;
 
 export const AboutContent = styled.div`
@@ -46,11 +34,6 @@ export const AboutContent = styled.div`
 
 export const TextContent = styled.div`
   margin-top: 10px;
-
-  h2 {
-    font-size: 2.5rem;
-    color: ${({ theme }) => theme.colors.textDark};
-  }
 
   p {
     margin-top: 40px;

@@ -1,44 +1,55 @@
-import { fetchCareersByUserId, fetchUserByUsername } from '@apis/userApi';
+import { fetchUserByUsername } from '@apis/userApi';
 import { useEffect, useState } from 'react';
 
-const EMPTY_USER = {
+export const EMPTY_USER = {
   id: '',
+  username: '',
   name: '',
   bio: '',
   profileImage: { url: '', altText: '' },
   skills: [],
+  careers: [],
   projects: [],
   posts: [],
   userType: '',
 };
 
-const ERROR_USER = {
-  ...EMPTY_USER,
-  name: '이름을 불러올 수 없음',
-  bio: '정보를 불러올 수 없음',
-};
+const initialState = (username) => ({
+  key: username,
+  user: EMPTY_USER,
+  loading: true,
+  error: false,
+});
 
 export default function useUser(username) {
-  const [userInfo, setUserInfo] = useState(EMPTY_USER);
-  const [careers, setCareers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(() => initialState(username));
+
+  // username이 바뀐 렌더에서는 이전 유저의 데이터가 잠깐이라도 보이지 않도록
+  // 렌더 중에 즉시 초기 상태로 보정한다.
+  if (state.key !== username) {
+    setState(initialState(username));
+  }
 
   useEffect(() => {
-    if (!username) return;
+    if (!username) return undefined;
 
     let ignore = false;
-    setLoading(true);
 
     (async () => {
       try {
-        const data = await fetchUserByUsername(username);
-        if (!ignore) setUserInfo(data);
+        const user = await fetchUserByUsername(username);
+        if (!ignore) {
+          setState({ key: username, user, loading: false, error: false });
+        }
       } catch (error) {
         if (ignore) return;
         console.error(`사용자 정보 로드 실패 (${username}):`, error);
-        setUserInfo(ERROR_USER);
-      } finally {
-        if (!ignore) setLoading(false);
+        setState({
+          key: username,
+          user: EMPTY_USER,
+          loading: false,
+          error: true,
+        });
       }
     })();
 
@@ -47,26 +58,5 @@ export default function useUser(username) {
     };
   }, [username]);
 
-  useEffect(() => {
-    if (!userInfo.id) return;
-
-    let ignore = false;
-
-    (async () => {
-      try {
-        const data = await fetchCareersByUserId(userInfo.id);
-        if (!ignore) setCareers(data);
-      } catch (error) {
-        if (ignore) return;
-        console.error(`경력 정보 로드 실패 (userId: ${userInfo.id}):`, error);
-        setCareers([]);
-      }
-    })();
-
-    return () => {
-      ignore = true;
-    };
-  }, [userInfo.id]);
-
-  return { userInfo, careers, loading };
+  return { user: state.user, loading: state.loading, error: state.error };
 }

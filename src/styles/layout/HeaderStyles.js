@@ -1,12 +1,25 @@
 import { LAYOUT } from '@styles/constants';
-import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+
+export const FixedHeaderArea = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+`;
+
+export const HeaderSpacer = styled.div`
+  padding-top: ${LAYOUT.HEADER_HEIGHT}px;
+`;
 
 export const HeaderContainer = styled.header`
   // color
   background-color: rgba(255, 255, 255, 0.9);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border || '#e0e0e0'};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
 
   // size
   width: 100%;
@@ -16,25 +29,36 @@ export const HeaderContainer = styled.header`
   align-items: center;
   display: flex;
   justify-content: center;
-  padding: 0 44px;
+  padding: 0 24px;
   position: fixed;
   z-index: 1001;
 `;
 
-export const Logo = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${({ theme }) => theme.colors.primary || '#333333'};
+export const HeaderSide = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: ${({ $justify }) => $justify || 'flex-start'};
+  gap: 16px;
+`;
+
+export const LogoLink = styled(Link)`
+  display: flex;
+  align-items: center;
 `;
 
 export const NavMenu = styled.nav`
   display: flex;
   align-items: center;
   gap: 36px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    gap: 16px;
+  }
 `;
 
-export const NavLink = styled.span`
-  color: ${({ theme }) => theme.colors.primary || '#333333'};
+const navLinkStyle = css`
+  color: ${({ theme }) => theme.colors.primary};
   font-size: 0.7rem;
   font-weight: 300;
   font-family:
@@ -46,6 +70,14 @@ export const NavLink = styled.span`
   align-items: center;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.secondary || '#646464'};
+    color: ${({ theme }) => theme.colors.secondary};
   }
+`;
+
+export const NavLink = styled.a`
+  ${navLinkStyle}
+`;
+
+export const NavRouterLink = styled(Link)`
+  ${navLinkStyle}
 `;

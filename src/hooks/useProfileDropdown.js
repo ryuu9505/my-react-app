@@ -1,6 +1,6 @@
-import { useAuth } from '@components/AuthProvider';
+import { useAuth } from '@contexts/AuthContext';
 import useClickOutside from '@hooks/useClickOutside';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function useProfileDropdown() {
@@ -11,20 +11,29 @@ export default function useProfileDropdown() {
 
   useClickOutside(dropdownRef, () => setIsDropdownOpen(false));
 
+  useEffect(() => {
+    if (!isDropdownOpen) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsDropdownOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isDropdownOpen]);
+
   const handleProfileClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    setIsDropdownOpen((open) => !open);
   };
 
   const handleMyPage = () => {
+    setIsDropdownOpen(false);
     if (user?.username) {
       navigate(`/${user.username}`);
-      setIsDropdownOpen(false);
     }
   };
 
   const handleLogout = async () => {
-    await logout();
     setIsDropdownOpen(false);
+    await logout();
     navigate('/');
   };
 
