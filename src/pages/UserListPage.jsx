@@ -1,14 +1,13 @@
-import { fetchUsersCursor } from '@apis/userApi';
 import { ProfileCard } from '@components/cards';
 import Footer from '@components/common/Footer';
 import Loading from '@components/common/Loading';
 import { Section } from '@components/common/Section';
 import Spinner from '@components/common/Spinner';
 import BasicHeader from '@components/header/BasicHeader';
-import useInfiniteScroll from '@hooks/useInfiniteScroll';
-import { PAGINATION } from '@styles/constants';
+import useIntersection from '@hooks/useIntersection';
+import useUsersInfiniteQuery from '@hooks/useUsersInfiniteQuery';
 import { transformCompanyLogos } from '@utils/transformCompanyLogos';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 
@@ -48,24 +47,15 @@ const RetryButton = styled.button`
 `;
 
 export default function UserListPage() {
-  const fetchPage = useCallback(
-    (cursor) =>
-      fetchUsersCursor({
-        pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
-        lastId: cursor,
-      }),
-    []
+  const { users, loading, loadingMore, hasMore, error, fetchNextPage, retry } =
+    useUsersInfiniteQuery();
+
+  const sentinelRef = useIntersection(
+    fetchNextPage,
+    hasMore && !loadingMore && !error
   );
 
-  const {
-    items: users,
-    loading,
-    hasMore,
-    error,
-    retry,
-  } = useInfiniteScroll(fetchPage);
-
-  if (users.length === 0 && loading) return <Loading />;
+  if (loading) return <Loading />;
 
   return (
     <>
@@ -91,21 +81,20 @@ export default function UserListPage() {
             />
           ))}
         </CenteredCardList>
-        {loading && users.length > 0 && (
-          <Spinner style={{ marginTop: 80, height: 10 }} />
-        )}
+        {loadingMore && <Spinner style={{ marginTop: 80, height: 10 }} />}
         {error && (
           <StatusBlock role="alert">
             사용자 목록을 불러오지 못했습니다.
-            <RetryButton onClick={retry}>다시 시도</RetryButton>
+            <RetryButton onClick={() => retry()}>다시 시도</RetryButton>
           </StatusBlock>
         )}
-        {!error && !loading && users.length === 0 && (
+        {!error && users.length === 0 && (
           <StatusBlock>아직 등록된 사용자가 없습니다.</StatusBlock>
         )}
         {!error && !hasMore && users.length > 0 && (
           <StatusBlock>All users loaded</StatusBlock>
         )}
+        <div ref={sentinelRef} aria-hidden="true" />
       </Section>
       <Footer />
     </>

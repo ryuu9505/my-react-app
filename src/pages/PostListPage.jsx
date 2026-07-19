@@ -33,7 +33,7 @@ export default function PostListPage() {
       <BasicHeader />
       <Section id="posts" padding="60px 20px 100px 20px">
         <SectionTitle>Posts</SectionTitle>
-        {error && (
+        {error && posts.length === 0 && (
           <StatusBlock role="alert">
             포스트 목록을 불러오지 못했습니다.
           </StatusBlock>
@@ -41,7 +41,7 @@ export default function PostListPage() {
         {!error && posts.length === 0 && (
           <StatusBlock>아직 등록된 포스트가 없습니다.</StatusBlock>
         )}
-        {!error && posts.length > 0 && (
+        {posts.length > 0 && (
           <ProjectList>
             {posts.map((post) => (
               <PostCard key={post.id} post={post} />

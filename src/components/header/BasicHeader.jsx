@@ -1,5 +1,6 @@
 import Logo from '@components/common/Logo';
 import ProfileSection from '@components/header/ProfileSection';
+import SearchButton from '@components/search/SearchButton';
 import useProfileDropdown from '@hooks/useProfileDropdown';
 import {
   FixedHeaderArea,
@@ -39,6 +40,7 @@ function BasicHeader() {
             </LogoLink>
           </HeaderSide>
           <HeaderSide $justify="flex-end">
+            <SearchButton />
             <ProfileSection
               user={user}
               loading={loading}

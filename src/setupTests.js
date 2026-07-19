@@ -27,3 +27,7 @@ if (!window.IntersectionObserver) {
 
 // jsdom의 scrollTo는 "Not implemented" 경고를 내므로 무조건 덮어쓴다.
 window.scrollTo = () => {};
+
+if (!Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}

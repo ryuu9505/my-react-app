@@ -4,5 +4,4 @@ export const LAYOUT = {
 
 export const PAGINATION = {
   DEFAULT_PAGE_SIZE: 10,
-  SCROLL_THRESHOLD: 100,
 };

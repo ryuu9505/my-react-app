@@ -161,11 +161,12 @@ const BackLink = styled(Link)`
 
 export default function PostPage() {
   const { postId } = useParams();
-  const { post, loading, error } = usePost(postId);
+  const { post, loading } = usePost(postId);
 
   if (loading) return <Loading />;
 
-  if (error || !post) {
+  // 캐시된 포스트가 있으면 refetch 실패(error)와 무관하게 본문을 유지한다.
+  if (!post) {
     return (
       <>
         <BasicHeader />

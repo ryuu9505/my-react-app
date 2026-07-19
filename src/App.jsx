@@ -1,7 +1,9 @@
 import ErrorBoundary from '@components/common/ErrorBoundary';
 import Loading from '@components/common/Loading';
 import ScrollToTop from '@components/common/ScrollToTop';
+import SearchProvider from '@components/search/SearchProvider';
 import { AuthProvider } from '@contexts/AuthContext';
+import { queryClient } from '@/queryClient';
 import LoginPage from '@pages/LoginPage';
 import NotFoundPage from '@pages/NotFoundPage';
 import PostListPage from '@pages/PostListPage';
@@ -9,6 +11,7 @@ import UserListPage from '@pages/UserListPage';
 import UserPage from '@pages/UserPage';
 import GlobalStyle from '@styles/GlobalStyle';
 import theme from '@styles/theme/theme';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { MotionConfig } from 'framer-motion';
 import React, { lazy, Suspense } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
@@ -25,25 +28,29 @@ function App() {
         <GlobalStyle />
         <ErrorBoundary>
           <MotionConfig reducedMotion="user">
-            <BrowserRouter>
-              <AuthProvider>
-                <ScrollToTop />
-                <Suspense fallback={<Loading />}>
-                  <Routes>
-                    <Route
-                      path="/"
-                      element={<Navigate to="/users" replace />}
-                    />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/users" element={<UserListPage />} />
-                    <Route path="/posts" element={<PostListPage />} />
-                    <Route path="/posts/:postId" element={<PostPage />} />
-                    <Route path="/:username" element={<UserPage />} />
-                    <Route path="*" element={<NotFoundPage />} />
-                  </Routes>
-                </Suspense>
-              </AuthProvider>
-            </BrowserRouter>
+            <QueryClientProvider client={queryClient}>
+              <BrowserRouter>
+                <AuthProvider>
+                  <SearchProvider>
+                    <ScrollToTop />
+                    <Suspense fallback={<Loading />}>
+                      <Routes>
+                        <Route
+                          path="/"
+                          element={<Navigate to="/users" replace />}
+                        />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/users" element={<UserListPage />} />
+                        <Route path="/posts" element={<PostListPage />} />
+                        <Route path="/posts/:postId" element={<PostPage />} />
+                        <Route path="/:username" element={<UserPage />} />
+                        <Route path="*" element={<NotFoundPage />} />
+                      </Routes>
+                    </Suspense>
+                  </SearchProvider>
+                </AuthProvider>
+              </BrowserRouter>
+            </QueryClientProvider>
           </MotionConfig>
         </ErrorBoundary>
       </ThemeProvider>

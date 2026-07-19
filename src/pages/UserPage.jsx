@@ -37,7 +37,9 @@ export default function UserPage() {
 
   if (loading) return <Loading />;
 
-  if (error) {
+  // 캐시된 프로필이 있는 상태에서 백그라운드 refetch만 실패한 경우에는
+  // 데이터를 그대로 보여주고, 데이터 자체가 없을 때만 NotFound를 렌더링한다.
+  if (error && !user.id) {
     return (
       <NotFoundPage
         title="사용자를 찾을 수 없습니다"

@@ -1,5 +1,6 @@
 import Logo from '@components/common/Logo';
 import ProfileSection from '@components/header/ProfileSection';
+import SearchButton from '@components/search/SearchButton';
 import useProfileDropdown from '@hooks/useProfileDropdown';
 import {
   FixedHeaderArea,
@@ -44,6 +45,7 @@ function Header({ sectionVisibility }) {
             )}
           </NavMenu>
           <HeaderSide $justify="flex-start">
+            <SearchButton />
             <ProfileSection
               user={user}
               loading={loading}
