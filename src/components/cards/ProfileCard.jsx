@@ -1,6 +1,7 @@
 import { robot, verified } from '@assets/images';
 import Avatar from '@components/common/Avatar';
 import Divider from '@components/common/Divider';
+import useHoverPrefetch, { usePrefetchUser } from '@hooks/usePrefetch';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -99,8 +100,10 @@ export default function ProfileCard({
   companyLogos,
   userType,
 }) {
+  const prefetchHandlers = useHoverPrefetch(usePrefetchUser(username));
+
   return (
-    <CardLink to={`/${username}`}>
+    <CardLink to={`/${username}`} {...prefetchHandlers}>
       <StyledProfileCard>
         {userType === 'TEST' && <BadgeIcon src={robot} alt="봇 사용자" />}
         {userType === 'ADMIN' && (

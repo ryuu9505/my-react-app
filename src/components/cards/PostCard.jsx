@@ -1,4 +1,5 @@
 import HoverImage from '@components/common/HoverImage';
+import useHoverPrefetch, { usePrefetchPost } from '@hooks/usePrefetch';
 import {
   Period,
   ProjectCard,
@@ -30,6 +31,8 @@ const InternalLink = styled(Link)`
 // 외부 블로그 글은 새 탭으로, 그 외에는 내부 포스트 상세 페이지로 연결한다.
 export default function PostCard({ post }) {
   const externalUrl = toSafeHttpUrl(post.externalUrl);
+  // 외부 블로그 글은 프리페치할 상세 데이터가 없으므로 내부 링크에만 적용한다.
+  const prefetchHandlers = useHoverPrefetch(usePrefetchPost(post.id));
 
   const body = (
     <>
@@ -63,7 +66,9 @@ export default function PostCard({ post }) {
           {body}
         </ExternalLink>
       ) : (
-        <InternalLink to={`/posts/${post.id}`}>{body}</InternalLink>
+        <InternalLink to={`/posts/${post.id}`} {...prefetchHandlers}>
+          {body}
+        </InternalLink>
       )}
     </ProjectCard>
   );
