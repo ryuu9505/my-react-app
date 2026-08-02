@@ -143,3 +143,6 @@ $RECYCLE.BIN/
 .idea/
 *.iml
 out/
+
+# Others
+docs/
