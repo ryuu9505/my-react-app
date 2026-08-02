@@ -8,11 +8,16 @@
     <title>Unblind</title>
     <meta name="description" content="Unblind | 당신의 이력을 더 빛나게" />
 
+    <!--
+      아래 태그는 모든 경로에 동일하게 적용되는 사이트 기본값이다.
+      og:url은 여기 두지 않는다. 공유 플랫폼이 이 값을 공유 객체의 정본 주소로 삼기 때문에,
+      고정값을 넣으면 프로필과 포스트를 각각 공유해도 전부 그 주소 하나로 합쳐진다.
+      값이 없으면 크롤러가 실제 요청 URL을 쓴다. 경로별 메타는 페이지에서 Helmet으로 넣는다.
+    -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Unblind" />
     <meta property="og:title" content="Unblind" />
     <meta property="og:description" content="당신의 이력을 더 빛나게" />
-    <meta property="og:url" content="https://unblind.kr/" />
     <meta property="og:image" content="https://unblind.kr/logo512.png" />
     <meta name="twitter:card" content="summary" />
 
