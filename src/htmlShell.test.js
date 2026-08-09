@@ -26,4 +26,16 @@ describe('index.html 정적 셸', () => {
     expect(html).toMatch(/property=["']og:title["']/);
     expect(html).toMatch(/property=["']og:image["']/);
   });
+
+  it('이미지 호스트에 preconnect를 걸고 crossorigin은 붙이지 않는다', () => {
+    // <img> 요청은 CORS 요청이 아니다. crossorigin을 붙이면 쓰이지 않는 종류의 연결을
+    // 예열하고 실제 요청 때 소켓을 다시 열어 오히려 손해다.
+    expect(html).toMatch(
+      /<link rel="preconnect" href="https:\/\/i\.imgur\.com"/
+    );
+    expect(html).toMatch(
+      /<link\s+rel="preconnect"\s+href="https:\/\/unblind-kr\.s3\.ap-northeast-2\.amazonaws\.com"/
+    );
+    expect(html).not.toMatch(/rel="preconnect"[^>]*crossorigin/);
+  });
 });

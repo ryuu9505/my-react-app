@@ -1,3 +1,5 @@
+import { toDirectImageUrl } from '@utils/imageUrl';
+
 export function transformCompanyLogos(careers) {
   if (!Array.isArray(careers)) return [];
 
@@ -7,14 +9,14 @@ export function transformCompanyLogos(careers) {
       const company = career.company;
       if (company?.wideLogo?.url) {
         return {
-          url: company.wideLogo.url,
+          url: toDirectImageUrl(company.wideLogo.url),
           altText: company.wideLogo.altText,
           isWide: true,
         };
       }
       if (company?.logo?.url) {
         return {
-          url: company.logo.url,
+          url: toDirectImageUrl(company.logo.url),
           altText: company.logo.altText,
           isWide: false,
         };

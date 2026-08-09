@@ -1,6 +1,8 @@
 import { robot, verified } from '@assets/images';
 import Avatar from '@components/common/Avatar';
 import Divider from '@components/common/Divider';
+import FadeInImage from '@components/common/FadeInImage';
+import Skeleton from '@components/common/Skeleton';
 import useHoverPrefetch, { usePrefetchUser } from '@hooks/usePrefetch';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -12,7 +14,8 @@ const CardLink = styled(Link)`
   display: block;
 `;
 
-const StyledProfileCard = styled.div`
+// 규격만 담은 표면. 스켈레톤 카드가 같은 것을 써야 데이터가 도착할 때 레이아웃이 흔들리지 않는다.
+const CardSurface = styled.div`
   position: relative;
   background-color: ${({ theme }) => theme.colors.backgroundLight};
   border-radius: 16px;
@@ -23,9 +26,12 @@ const StyledProfileCard = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  transition: transform 0.2s;
   border: 1.5px solid ${({ theme }) => theme.colors.border};
   box-sizing: border-box;
+`;
+
+const StyledProfileCard = styled(CardSurface)`
+  transition: transform 0.2s;
 
   &:hover {
     transform: translateY(-8px);
@@ -63,31 +69,35 @@ const Bio = styled.div`
   padding: 0 12px;
 `;
 
+const LOGO_WIDTH = 100;
+const LOGO_HEIGHT = 30;
+
+// 로고가 없는 사용자도 같은 높이를 차지해야 카드 높이가 한 종류로 유지되고
+// 마지막 행이 어긋나지 않는다.
 const CompanyLogoRow = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
+  min-height: ${LOGO_HEIGHT}px;
 `;
 
-const CompanyLogoImg = styled.img`
-  height: 30px;
-  width: auto;
-  object-fit: contain;
-  max-width: 100px;
-`;
+function CompanyLogoList({ logos, priority }) {
+  const logo = logos?.[0];
 
-function CompanyLogoList({ logos }) {
-  if (!logos || logos.length === 0) return null;
   return (
-    <CompanyLogoRow>
-      {logos.slice(0, 1).map((logo, idx) => (
-        <CompanyLogoImg
-          key={logo?.url || idx}
-          src={logo?.url}
-          alt={logo?.altText || 'company logo'}
+    <CompanyLogoRow data-logo-row="true">
+      {logo ? (
+        <FadeInImage
+          src={logo.url}
+          alt={logo.altText || 'company logo'}
+          width={LOGO_WIDTH}
+          height={LOGO_HEIGHT}
+          fit="contain"
+          showSkeleton={false}
+          loading={priority ? undefined : 'lazy'}
         />
-      ))}
+      ) : null}
     </CompanyLogoRow>
   );
 }
@@ -99,6 +109,7 @@ export default function ProfileCard({
   bio,
   companyLogos,
   userType,
+  priority = false,
 }) {
   const prefetchHandlers = useHoverPrefetch(usePrefetchUser(username));
 
@@ -113,13 +124,40 @@ export default function ProfileCard({
           src={profileImage?.url}
           alt={profileImage?.altText || username || 'profile'}
           size={64}
+          loading={priority ? undefined : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
         />
         <Username>{username}</Username>
         <Name>{name}</Name>
         <Bio>{bio}</Bio>
         <Divider margin="16px" />
-        <CompanyLogoList logos={companyLogos} />
+        <CompanyLogoList logos={companyLogos} priority={priority} />
       </StyledProfileCard>
     </CardLink>
+  );
+}
+
+const SkeletonLines = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+`;
+
+// 데이터가 아직 없는 단계에서는 카드 전체가 가짜이므로 로고 자리까지 shimmer로 그린다.
+// 데이터가 도착한 뒤에는 카드가 진짜이고 이미지만 비어 있어 아바타 자리만 shimmer로 남는다.
+export function ProfileCardSkeleton() {
+  return (
+    <CardSurface aria-hidden="true">
+      <Skeleton width="64px" height="64px" radius="50%" />
+      <SkeletonLines>
+        <Skeleton width="72px" height="12px" />
+        <Skeleton width="56px" height="12px" />
+        <Skeleton width="96px" height="10px" />
+      </SkeletonLines>
+      <Divider margin="16px" />
+      <Skeleton width={`${LOGO_WIDTH}px`} height={`${LOGO_HEIGHT}px`} />
+    </CardSurface>
   );
 }
