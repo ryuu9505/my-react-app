@@ -42,4 +42,17 @@ describe('transformCompanyLogos', () => {
     }));
     expect(transformCompanyLogos(careers)).toHaveLength(3);
   });
+
+  it('imgur 로고 주소를 i.imgur.com으로 정규화해 302 왕복을 없앤다', () => {
+    const careers = [
+      {
+        company: {
+          wideLogo: { url: 'https://imgur.com/vR2EWGZ.png', altText: 'wide' },
+        },
+      },
+    ];
+    expect(transformCompanyLogos(careers)).toEqual([
+      { url: 'https://i.imgur.com/vR2EWGZ.png', altText: 'wide', isWide: true },
+    ]);
+  });
 });
